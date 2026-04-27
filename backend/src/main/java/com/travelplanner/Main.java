@@ -38,7 +38,7 @@ public class Main {
         HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
         server.createContext("/api/auth", new AuthController(authService));
         server.createContext("/api/destinations", new DestinationController(destinationRepository));
-        server.createContext("/api/recommendations", new RecommendationController(recommendationService));
+        server.createContext("/api/recommend", new RecommendationController(recommendationService));
         server.createContext("/api/wishlist", new WishlistController(wishlistService));
         server.createContext("/api/trips", new TripController(tripService));
         server.setExecutor(Executors.newFixedThreadPool(12));

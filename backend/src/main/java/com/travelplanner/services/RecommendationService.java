@@ -21,12 +21,46 @@ public class RecommendationService {
         UserPreferences preferences = new UserPreferences(
             String.valueOf(payload.getOrDefault("theme", "")),
             String.valueOf(payload.getOrDefault("subcategory", "")),
-            ((Number) payload.getOrDefault("dailyBudget", 0)).doubleValue(),
+            ((Number) payload.getOrDefault("budget", payload.getOrDefault("dailyBudget", 0))).doubleValue(),
             ((Number) payload.getOrDefault("durationDays", 1)).intValue(),
-            String.valueOf(payload.getOrDefault("countryPreference", ""))
+            String.valueOf(payload.getOrDefault("country", payload.getOrDefault("countryPreference", "")))
         );
-        List<Destination> destinations = destinationRepository.findAll();
+
+        System.out.println("User Country: " + preferences.getCountryPreference());
+        System.out.println("User Budget: " + preferences.getDailyBudget());
+
+        List<Destination> allDestinations = destinationRepository.findAll();
+
+        // Step 1: Apply Filters
+        List<Destination> filtered = allDestinations.stream()
+            .filter(d -> filterByCountry(d, preferences))
+            .filter(d -> filterByBudget(d, preferences))
+            .toList();
+            
+        System.out.println("Filtered Size: " + filtered.size());
+
+        if (filtered.isEmpty()) {
+            return List.of();
+        }
+
+        // Step 2: Apply Strategy
         RecommendationStrategy strategy = StrategyFactory.getStrategy(preferences.getTheme());
-        return strategy.recommend(destinations, preferences);
+        List<ScoredDestination> scored = strategy.recommend(filtered, preferences);
+
+        // Step 3: Sort
+        return scored.stream()
+            .sorted((s1, s2) -> Integer.compare(s2.getScore(), s1.getScore()))
+            .toList();
+    }
+
+    private boolean filterByCountry(Destination d, UserPreferences pref) {
+        if (pref.getCountryPreference() == null || pref.getCountryPreference().trim().isEmpty()) {
+            return true;
+        }
+        return d.getCountry().equalsIgnoreCase(pref.getCountryPreference().trim());
+    }
+
+    private boolean filterByBudget(Destination d, UserPreferences pref) {
+        return d.getCostPerDay() <= pref.getDailyBudget();
     }
 }

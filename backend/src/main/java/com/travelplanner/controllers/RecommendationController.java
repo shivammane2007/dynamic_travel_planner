@@ -26,6 +26,6 @@ public class RecommendationController extends BaseController {
         }
 
         Map<String, Object> body = JsonUtil.fromJson(readBody(exchange));
-        sendJson(exchange, 200, Map.of("success", true, "data", recommendationService.recommend(body)));
+        sendJson(exchange, 200, recommendationService.recommend(body));
     }
 }

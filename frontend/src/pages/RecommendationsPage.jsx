@@ -7,7 +7,7 @@ import PageTransition from "../components/shared/PageTransition";
 export default function RecommendationsPage() {
   const { state } = useLocation();
   const navigate = useNavigate();
-  const [items, setItems] = useState([]);
+  const [destinations, setDestinations] = useState([]);
   const [loading, setLoading] = useState(true);
   const preferences = state?.preferences;
 
@@ -18,9 +18,17 @@ export default function RecommendationsPage() {
     }
 
     let active = true;
-    api.post("/recommendations", preferences).then(({ data }) => {
+    const payload = {
+      theme: preferences.theme,
+      subcategory: preferences.subcategory,
+      budget: preferences.dailyBudget,
+      country: preferences.countryPreference,
+      durationDays: preferences.durationDays
+    };
+
+    api.post("/recommend", payload).then((response) => {
       if (active) {
-        setItems(data.data);
+        setDestinations(response.data);
         setLoading(false);
       }
     });
@@ -48,9 +56,9 @@ export default function RecommendationsPage() {
       </div>
       {loading ? (
         <div className="py-16 text-center text-muted">Scoring destinations...</div>
-      ) : items.length ? (
+      ) : destinations.length ? (
         <section className="mt-8 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-          {items.map((item) => (
+          {destinations.map((item) => (
             <DestinationCard key={item.id} destination={item} onSave={handleSave} onBook={handleBook} />
           ))}
         </section>
