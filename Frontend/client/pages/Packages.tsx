@@ -8,114 +8,42 @@ export default function Packages() {
   const [selectedDestination, setSelectedDestination] = useState("");
   const [priceRange, setPriceRange] = useState([0, 5000]);
   const [sortBy, setSortBy] = useState("popular");
+  const [allPackages, setAllPackages] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // All packages data
-  const allPackages = [
-    {
-      id: "1",
-      title: "Parisian Romance",
-      destination: "Paris, France",
-      description:
-        "Experience luxury in the heart of Europe with guided tours and fine dining",
-      image:
-        "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=500&h=400&fit=crop",
-      price: 2499,
-      duration: 7,
-      rating: 4.9,
-      reviews: 328,
-    },
-    {
-      id: "2",
-      title: "Bali Escape",
-      destination: "Bali, Indonesia",
-      description:
-        "All-inclusive tropical getaway with spa treatments and beach time",
-      image:
-        "/assets/images/indonesia-bali.jpg",
-      price: 1799,
-      duration: 5,
-      rating: 4.8,
-      reviews: 512,
-    },
-    {
-      id: "3",
-      title: "Tokyo Adventure",
-      destination: "Tokyo, Japan",
-      description:
-        "Immerse yourself in Japanese culture with traditional and modern experiences",
-      image:
-        "/assets/images/japan-tokyo.jpg",
-      price: 2199,
-      duration: 8,
-      rating: 4.7,
-      reviews: 276,
-    },
-    {
-      id: "4",
-      title: "NYC Discovery",
-      destination: "New York, USA",
-      description:
-        "See Broadway shows, visit iconic museums, and enjoy world-class dining",
-      image:
-        "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=500&h=400&fit=crop",
-      price: 2099,
-      duration: 6,
-      rating: 4.6,
-      reviews: 441,
-    },
-    {
-      id: "5",
-      title: "Dubai Luxury",
-      destination: "Dubai, UAE",
-      description:
-        "Experience ultra-modern luxury with desert safaris and world-class shopping",
-      image:
-        "https://images.unsplash.com/photo-1512453475885-1b2d8b5c8e1e?w=500&h=400&fit=crop",
-      price: 1999,
-      duration: 4,
-      rating: 4.8,
-      reviews: 389,
-    },
-    {
-      id: "6",
-      title: "European Grand Tour",
-      destination: "Paris, France",
-      description:
-        "Visit multiple European capitals with guided tours and luxury accommodations",
-      image:
-        "https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=500&h=400&fit=crop",
-      price: 3499,
-      duration: 14,
-      rating: 4.9,
-      reviews: 203,
-    },
-    {
-      id: "7",
-      title: "Kyoto Traditional",
-      destination: "Tokyo, Japan",
-      description:
-        "Explore ancient temples, traditional tea ceremonies, and peaceful gardens",
-      image:
-        "https://images.unsplash.com/photo-1493246507139-91e8fad9978e?w=500&h=400&fit=crop",
-      price: 1899,
-      duration: 6,
-      rating: 4.7,
-      reviews: 294,
-    },
-    {
-      id: "8",
-      title: "Beach Paradise",
-      destination: "Bali, Indonesia",
-      description:
-        "Surfing, diving, and relaxation on the most beautiful tropical beaches",
-      image:
-        "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=500&h=400&fit=crop",
-      price: 1599,
-      duration: 5,
-      rating: 4.6,
-      reviews: 567,
-    },
-  ];
+  useEffect(() => {
+    const fetchPackages = async () => {
+      try {
+        const res = await fetch("/api/packages");
+        if (res.ok) {
+          const data = await res.json();
+          // API returns an ApiResponse { success: true, data: [...] } or direct array
+          const pkgs = data.data ? data.data : data;
+          
+          // Map DB keys to frontend keys if necessary, or just use as is
+          const mappedPkgs = pkgs.map((p: any) => ({
+            id: p.id.toString(),
+            title: p.title,
+            destination: `${p.city}, ${p.country}`,
+            description: p.description,
+            image: p.heroImage || p.image,
+            price: p.pricePerPerson,
+            duration: p.durationDays,
+            rating: p.rating,
+            reviews: p.reviewsCount
+          }));
+          
+          setAllPackages(mappedPkgs);
+        }
+      } catch (err) {
+        console.error("Failed to fetch packages", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPackages();
+  }, []);
+
 
   // Get unique destinations
   const destinations = [...new Set(allPackages.map((pkg) => pkg.destination))];
@@ -283,7 +211,11 @@ export default function Packages() {
               </div>
 
               {/* Packages */}
-              {filteredPackages.length > 0 ? (
+              {loading ? (
+                <div className="text-center py-12">
+                  <p className="text-gray-600 text-lg">Loading packages...</p>
+                </div>
+              ) : filteredPackages.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {filteredPackages.map((pkg) => (
                     <PackageCard key={pkg.id} {...pkg} />

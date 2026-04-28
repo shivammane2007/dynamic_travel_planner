@@ -4,6 +4,12 @@ import cors from "cors";
 import { handleDemo } from "./routes/demo";
 import { handleContact } from "./routes/contact";
 import { handleBooking } from "./routes/bookings";
+import { handlePlanner } from "./routes/planner";
+import { 
+  handleGetStats, handleGetRevenue, handleGetActivities, 
+  handleGetManualTrips, handleGetContactMessages, 
+  handleGetPackages, handleGetBookingsList 
+} from "./routes/mockDashboard";
 
 export function createServer() {
   const app = express();
@@ -26,6 +32,18 @@ export function createServer() {
 
   // Booking confirmation — sends email to user
   app.post("/api/bookings", handleBooking);
+
+  // Trip Planner generator
+  app.post("/api/planner/generate", handlePlanner);
+
+  // MOCK DASHBOARD ENDPOINTS (used when Java backend is off)
+  app.get("/api/dashboard/stats", handleGetStats);
+  app.get("/api/dashboard/revenue", handleGetRevenue);
+  app.get("/api/dashboard/activities", handleGetActivities);
+  app.get("/api/manual-trips", handleGetManualTrips);
+  app.get("/api/contact-messages", handleGetContactMessages);
+  app.get("/api/packages", handleGetPackages);
+  app.get("/api/bookings", handleGetBookingsList);
 
   return app;
 }

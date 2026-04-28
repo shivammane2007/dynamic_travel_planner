@@ -88,11 +88,12 @@ export default function BookingPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          ...form,
+          userId: 1, // Mock user ID since we don't have auth yet
+          packageId: parseInt(id || "1"),
           travelers,
-          packageTitle: pkgData.title,
-          destination: pkgData.destination,
           totalPrice: total,
+          status: "CONFIRMED",
+          travelDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] // 30 days from now
         }),
       });
 

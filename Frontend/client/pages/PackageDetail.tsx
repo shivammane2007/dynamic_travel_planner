@@ -27,6 +27,72 @@ export default function PackageDetail() {
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [heartPop, setHeartPop] = useState(false);
   const { isFavorite, toggleFavorite } = useFavorites();
+  
+  const [packageData, setPackageData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchPackage = async () => {
+      try {
+        const res = await fetch(`/api/packages/${id || "1"}`);
+        if (res.ok) {
+          const data = await res.json();
+          const p = data.data || data;
+          
+          let parsedHighlights = [];
+          let parsedItinerary = [];
+          let parsedGallery = [];
+          try { parsedHighlights = p.highlights ? JSON.parse(p.highlights) : []; } catch (e) {}
+          try { parsedItinerary = p.itinerary ? JSON.parse(p.itinerary) : []; } catch (e) {}
+          try { parsedGallery = p.galleryImages ? JSON.parse(p.galleryImages) : []; } catch (e) {}
+
+          setPackageData({
+            title: p.title,
+            destination: `${p.city}, ${p.country}`,
+            description: p.description,
+            image: p.heroImage || p.image,
+            price: p.pricePerPerson,
+            duration: p.durationDays,
+            rating: p.rating,
+            reviewCount: p.reviewsCount,
+            groupSize: `${p.minPeople}-${p.maxPeople} people`,
+            highlights: parsedHighlights.length ? parsedHighlights : [
+              "Skip-the-line attraction access",
+              "Private guided tours",
+              "Gourmet dining experiences",
+              "Luxury accommodations"
+            ],
+            itinerary: parsedItinerary.length ? parsedItinerary : [
+              { day: 1, title: "Arrival", description: "Arrive and transfer to your luxury hotel." },
+              { day: 2, title: "Exploration", description: "Guided city tour." },
+              { day: p.durationDays, title: "Departure", description: "Transfer to airport." }
+            ],
+            included: [
+              `${p.durationDays - 1} nights accommodation in luxury hotel`,
+              "Daily breakfast",
+              "All main attractions entrance fees",
+              "Professional English-speaking guide",
+              "Private transportation"
+            ],
+            notIncluded: [
+              "International flights",
+              "Personal expenses",
+              "Optional activities"
+            ],
+            customerReviews: [
+              { author: "Sarah M.", rating: 5, comment: "Incredible trip!" },
+              { author: "James L.", rating: 5, comment: "Highly recommended!" }
+            ]
+          });
+        }
+      } catch (err) {
+        console.error("Failed to fetch package", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPackage();
+  }, [id]);
 
   // Derived after package data is defined (see below)
   const packageId = id || "1";
@@ -101,106 +167,27 @@ export default function PackageDetail() {
     });
   };
 
-  // Package data (in a real app, this would come from an API)
-  const packagesData: Record<string, any> = {
-    "1": {
-      title: "Parisian Romance",
-      destination: "Paris, France",
-      description:
-        "Experience the magic of Paris with 7 days of luxury, culture, and romance",
-      image:
-        "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=1200&h=600&fit=crop",
-      price: 2499,
-      duration: 7,
-      rating: 4.9,
-      reviewCount: 328,
-      groupSize: "2-8 people",
-      bestFor: "Couples, honeymooners, culture enthusiasts",
-      highlights: [
-        "Skip-the-line Eiffel Tower access",
-        "Private Seine river cruise",
-        "Gourmet dining experiences",
-        "Louvre Museum guided tour",
-        "Champs-Élysées shopping",
-        "Versailles Palace visit",
-      ],
-      itinerary: [
-        {
-          day: 1,
-          title: "Arrival in Paris",
-          description:
-            "Arrive at Paris Charles de Gaulle Airport. Transfer to your luxury hotel in the heart of Paris.",
-        },
-        {
-          day: 2,
-          title: "Eiffel Tower & City Exploration",
-          description:
-            "Visit the iconic Eiffel Tower with skip-the-line access. Evening Seine river cruise with dinner.",
-        },
-        {
-          day: 3,
-          title: "Louvre & Art",
-          description:
-            "Guided tour of the world-famous Louvre Museum. Explore masterpieces and cultural treasures.",
-        },
-        {
-          day: 4,
-          title: "Versailles Palace",
-          description:
-            "Day trip to the stunning Palace of Versailles. Explore gardens and royal chambers.",
-        },
-        {
-          day: 5,
-          title: "Shopping & Leisure",
-          description:
-            "Free day for shopping on Champs-Élysées or exploring neighborhoods. Optional activities available.",
-        },
-        {
-          day: 6,
-          title: "Montmartre & Nightlife",
-          description:
-            "Visit artistic Montmartre. Evening cabaret show at a famous Parisian venue.",
-        },
-        {
-          day: 7,
-          title: "Departure",
-          description:
-            "Breakfast at a local café. Transfer to airport for departure.",
-        },
-      ],
-      included: [
-        "6 nights accommodation in 5-star hotel",
-        "Daily breakfast",
-        "4 gourmet dinners",
-        "All main attractions entrance fees",
-        "Professional English-speaking guide",
-        "Private transportation",
-        "Travel insurance",
-      ],
-      notIncluded: [
-        "International flights",
-        "Personal expenses",
-        "Optional activities",
-        "Beverages at restaurants",
-      ],
-      customerReviews: [
-        {
-          author: "Sarah M.",
-          rating: 5,
-          comment:
-            "The most romantic trip I could have asked for! Everything was perfectly organized.",
-        },
-        {
-          author: "James L.",
-          rating: 5,
-          comment:
-            "Outstanding service and incredible attention to detail. Highly recommended!",
-        },
-      ],
-    },
-  };
+  if (loading) {
+    return (
+      <Layout>
+        <div className="flex items-center justify-center h-screen">
+          <p className="text-xl text-gray-500 font-semibold animate-pulse">Loading package details...</p>
+        </div>
+      </Layout>
+    );
+  }
 
-  const package_data = packagesData[id || "1"] || packagesData["1"];
+  if (!packageData) {
+    return (
+      <Layout>
+        <div className="flex items-center justify-center h-screen">
+          <p className="text-xl text-gray-500 font-semibold">Package not found.</p>
+        </div>
+      </Layout>
+    );
+  }
+
+  const package_data = packageData;
 
   return (
     <Layout>

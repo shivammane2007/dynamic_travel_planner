@@ -41,6 +41,13 @@ public class Main {
         UserRepository userRepo               = new UserRepository(dataSource);
         BookingRepository bookingRepo         = new BookingRepository(dataSource);
         ItineraryRepository itineraryRepo     = new ItineraryRepository(dataSource);
+        PackageRepository packageRepo         = new PackageRepository(dataSource);
+        HotelRepository hotelRepo             = new HotelRepository(dataSource);
+        BlogRepository blogRepo               = new BlogRepository(dataSource);
+        ContactMessageRepository contactRepo  = new ContactMessageRepository(dataSource);
+        FavoriteRepository favoriteRepo       = new FavoriteRepository(dataSource);
+        ManualTripRepository manualTripRepo   = new ManualTripRepository(dataSource);
+        DashboardRepository dashboardRepo     = new DashboardRepository(dataSource);
 
         // 5. Instantiate Services (injected with repos — Layered Composition)
         DestinationService destinationSvc = new DestinationService(destinationRepo);
@@ -48,6 +55,15 @@ public class Main {
         UserService userSvc               = new UserService(userRepo);
         BookingService bookingSvc         = new BookingService(bookingRepo, tripRepo);
         ItineraryService itinerarySvc     = new ItineraryService(itineraryRepo, tripRepo);
+        PackageService packageSvc         = new PackageService(packageRepo);
+        BlogService blogSvc               = new BlogService(blogRepo);
+        ContactMessageService contactSvc  = new ContactMessageService(contactRepo);
+        FavoriteService favoriteSvc       = new FavoriteService(favoriteRepo);
+        ManualTripService manualTripSvc   = new ManualTripService(manualTripRepo);
+        DashboardService dashboardSvc     = new DashboardService(dashboardRepo);
+        
+        ApiIntegrationService apiIntegrationSvc = new com.luxtravel.services.impl.GoogleApiIntegrationServiceImpl(EnvUtil.get("GOOGLE_API_KEY", "AIzaSyBGSiFm0d6hGwjhf8uBTMNaqRAJ6VpZdIo"));
+        TripPlannerService tripPlannerSvc = new TripPlannerService(apiIntegrationSvc);
 
         // 6. Build Gson-backed JsonMapper for Javalin
         Gson gson = JsonUtil.getGson();
@@ -82,7 +98,14 @@ public class Main {
             new TripController(app, tripSvc, itinerarySvc),
             new UserController(app, userSvc),
             new BookingController(app, bookingSvc),
-            new ItineraryController(app, itinerarySvc)
+            new ItineraryController(app, itinerarySvc),
+            new TripPlannerController(app, tripPlannerSvc),
+            new PackageController(app, packageSvc),
+            new BlogController(app, blogSvc),
+            new ContactMessageController(app, contactSvc),
+            new FavoriteController(app, favoriteSvc),
+            new ManualTripController(app, manualTripSvc),
+            new DashboardController(app, dashboardSvc)
         );
         controllers.forEach(BaseController::registerRoutes);
 
