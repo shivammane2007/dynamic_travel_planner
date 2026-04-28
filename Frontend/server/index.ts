@@ -3,6 +3,7 @@ import express from "express";
 import cors from "cors";
 import { handleDemo } from "./routes/demo";
 import { handleContact } from "./routes/contact";
+import { handleBooking } from "./routes/bookings";
 
 export function createServer() {
   const app = express();
@@ -22,6 +23,9 @@ export function createServer() {
 
   // Contact form — sends email via Nodemailer
   app.post("/api/contact", handleContact);
+
+  // Booking confirmation — sends email to user
+  app.post("/api/bookings", handleBooking);
 
   return app;
 }

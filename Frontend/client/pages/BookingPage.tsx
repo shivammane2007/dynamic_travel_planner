@@ -83,11 +83,33 @@ export default function BookingPage() {
     }
 
     setIsSubmitting(true);
-    // Simulate API call
-    await new Promise((r) => setTimeout(r, 1500));
-    setIsSubmitting(false);
-    setIsBooked(true);
-    toast.success("🎉 Booking Confirmed Successfully!", { duration: 5000 });
+    try {
+      const response = await fetch("/api/bookings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...form,
+          travelers,
+          packageTitle: pkgData.title,
+          destination: pkgData.destination,
+          totalPrice: total,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        setIsBooked(true);
+        toast.success("🎉 Booking Confirmed Successfully!", { duration: 5000 });
+      } else {
+        throw new Error(data.message || "Booking failed");
+      }
+    } catch (error: any) {
+      console.error("Booking Error:", error);
+      toast.error(error.message || "Failed to process booking. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // --- Success State ---
