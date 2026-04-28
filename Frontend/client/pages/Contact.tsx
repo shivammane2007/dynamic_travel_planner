@@ -1,6 +1,7 @@
 import Layout from "@/components/Layout";
 import { Mail, Phone, MapPin, Clock } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 
 export default function Contact() {
   const [formData, setFormData] = useState({
@@ -9,17 +10,66 @@ export default function Contact() {
     subject: "",
     message: "",
   });
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
 
-  const handleChange = (e: any) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
-  const handleSubmit = (e: any) => {
+  const validate = () => {
+    const newErrors: Record<string, string> = {};
+    if (!formData.name.trim() || formData.name.trim().length < 2)
+      newErrors.name = "Full name must be at least 2 characters.";
+    if (!formData.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email))
+      newErrors.email = "Please enter a valid email address.";
+    if (!formData.subject.trim())
+      newErrors.subject = "Subject is required.";
+    if (!formData.message.trim() || formData.message.trim().length < 10)
+      newErrors.message = "Message must be at least 10 characters.";
+    return newErrors;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission
-    console.log("Form submitted:", formData);
-    setFormData({ name: "", email: "", subject: "", message: "" });
+
+    const validationErrors = validate();
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+
+    setStatus("sending");
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        setStatus("sent");
+        toast.success("✉️ Message sent successfully! We'll be in touch within 24 hours.", {
+          duration: 6000,
+        });
+        setFormData({ name: "", email: "", subject: "", message: "" });
+        setErrors({});
+        // Reset button after 3s
+        setTimeout(() => setStatus("idle"), 3000);
+      } else {
+        throw new Error(data.message || "Send failed");
+      }
+    } catch (err: any) {
+      setStatus("error");
+      toast.error(
+        err?.message || "Failed to send. Please try again or email us directly.",
+        { duration: 6000 }
+      );
+      setTimeout(() => setStatus("idle"), 3000);
+    }
   };
 
   return (
@@ -134,9 +184,13 @@ export default function Contact() {
                     value={formData.name}
                     onChange={handleChange}
                     placeholder="John Doe"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                    required
+                    className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary ${
+                      errors.name ? "border-red-400" : "border-gray-300"
+                    }`}
                   />
+                  {errors.name && (
+                    <p className="text-red-500 text-xs mt-1">{errors.name}</p>
+                  )}
                 </div>
 
                 {/* Email */}
@@ -150,9 +204,13 @@ export default function Contact() {
                     value={formData.email}
                     onChange={handleChange}
                     placeholder="john@example.com"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                    required
+                    className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary ${
+                      errors.email ? "border-red-400" : "border-gray-300"
+                    }`}
                   />
+                  {errors.email && (
+                    <p className="text-red-500 text-xs mt-1">{errors.email}</p>
+                  )}
                 </div>
 
                 {/* Subject */}
@@ -166,9 +224,13 @@ export default function Contact() {
                     value={formData.subject}
                     onChange={handleChange}
                     placeholder="Inquiry about packages"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                    required
+                    className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary ${
+                      errors.subject ? "border-red-400" : "border-gray-300"
+                    }`}
                   />
+                  {errors.subject && (
+                    <p className="text-red-500 text-xs mt-1">{errors.subject}</p>
+                  )}
                 </div>
 
                 {/* Message */}
@@ -182,17 +244,28 @@ export default function Contact() {
                     onChange={handleChange}
                     placeholder="Tell us about your travel dreams..."
                     rows={5}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary resize-none"
-                    required
+                    className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary resize-none ${
+                      errors.message ? "border-red-400" : "border-gray-300"
+                    }`}
                   />
+                  {errors.message && (
+                    <p className="text-red-500 text-xs mt-1">{errors.message}</p>
+                  )}
                 </div>
 
                 {/* Submit Button */}
                 <button
                   type="submit"
-                  className="w-full py-3 bg-gradient-to-r from-primary to-secondary text-white rounded-lg font-semibold hover:opacity-90 transition-opacity"
+                  disabled={status === "sending"}
+                  className="w-full py-3 bg-gradient-to-r from-primary to-secondary text-white rounded-lg font-semibold hover:opacity-90 transition-opacity disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
-                  Send Message
+                  {status === "sending" && (
+                    <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  )}
+                  {status === "idle" && "Send Message"}
+                  {status === "sending" && "Sending..."}
+                  {status === "sent" && "✓ Sent Successfully"}
+                  {status === "error" && "Try Again"}
                 </button>
               </form>
 
