@@ -169,29 +169,82 @@ export const handleContact: RequestHandler = async (req, res) => {
 
   const data = payload as ContactPayload;
 
-  // 2. Send emails
+  // 2. Diagnostic logs — visible in your terminal
+  const mailUser = process.env.MAIL_USER;
+  const mailPass = process.env.MAIL_PASS;
+  const receiver = process.env.CONTACT_RECEIVER_EMAIL || mailUser;
+
+  console.log("\n─────────────────────────────────────────");
+  console.log("📩 [Contact API] New submission received");
+  console.log("  From   :", data.name, `<${data.email}>`);
+  console.log("  Subject:", data.subject);
+  console.log("  MAIL_USER loaded :", mailUser ? `✅ ${mailUser}` : "❌ MISSING");
+  console.log("  MAIL_PASS loaded :", mailPass ? `✅ (${mailPass.replace(/\S/g, "*")})` : "❌ MISSING");
+  console.log("  Sending to admin :", receiver);
+  console.log("─────────────────────────────────────────\n");
+
+  if (!mailUser || !mailPass) {
+    console.error("❌ [Contact API] MAIL_USER or MAIL_PASS not set in .env");
+    res.status(500).json({
+      success: false,
+      message: "Server email configuration is missing. Please contact us directly.",
+    });
+    return;
+  }
+
+  // 3. Send emails
   try {
-    const transporter = createTransporter();
+    // Gmail App Passwords sometimes include spaces — strip them
+    const cleanPass = mailPass.replace(/\s/g, "");
 
-    // Verify SMTP connection
+    const transporter = nodemailer.createTransport({
+      host: process.env.MAIL_HOST || "smtp.gmail.com",
+      port: Number(process.env.MAIL_PORT || 587),
+      secure: false, // STARTTLS on port 587
+      auth: {
+        user: mailUser,
+        pass: cleanPass,
+      },
+    });
+
+    // Verify SMTP connection before sending
+    console.log("⏳ [Contact API] Verifying SMTP connection...");
     await transporter.verify();
+    console.log("✅ [Contact API] SMTP connection verified");
 
-    // Send admin notification + user auto-reply in parallel
-    await Promise.all([
+    // Send both emails in parallel
+    const [adminInfo, userInfo] = await Promise.all([
       transporter.sendMail(buildAdminMail(data)),
       transporter.sendMail(buildUserReplyMail(data)),
     ]);
+
+    console.log("✅ [Contact API] Admin email sent →", adminInfo.messageId);
+    console.log("✅ [Contact API] User reply sent  →", userInfo.messageId);
+    console.log("─────────────────────────────────────────\n");
 
     res.json({
       success: true,
       message: "Message sent successfully! We'll be in touch within 24 hours.",
     });
   } catch (err: any) {
-    console.error("[Contact API] Email send failed:", err?.message ?? err);
-    res.status(500).json({
-      success: false,
-      message:
-        "Failed to send message. Please try again or email us directly at hello@luxtravel.com",
-    });
+    console.error("❌ [Contact API] Email send FAILED");
+    console.error("   Error code   :", err?.code);
+    console.error("   Error message:", err?.message);
+    console.error("   Full error   :", err);
+    console.log("─────────────────────────────────────────\n");
+
+    // Provide specific error hints based on Gmail error codes
+    let userMessage =
+      "Failed to send message. Please try again or email us directly at hello@luxtravel.com";
+
+    if (err?.code === "EAUTH") {
+      userMessage =
+        "Email authentication failed. Please check SMTP credentials.";
+    } else if (err?.code === "ECONNREFUSED" || err?.code === "ETIMEDOUT") {
+      userMessage = "Cannot connect to email server. Please try again later.";
+    }
+
+    res.status(500).json({ success: false, message: userMessage });
   }
 };
+
