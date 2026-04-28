@@ -1,0 +1,17 @@
+INSERT INTO destinations (name, country, city, theme, subcategory, cost_per_day, image_url, rating) VALUES
+('Annapurna Base Camp', 'Nepal', 'Pokhara', 'adventure', 'trekking', 80, 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1200&q=80', 4.8),
+('Patagonia Trails', 'Argentina', 'El Chalten', 'adventure', 'hiking', 140, 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80', 4.7),
+('Coral Bay Retreat', 'Maldives', 'Male', 'beach', 'snorkeling', 460, 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80', 4.9),
+('Palawan Coastline', 'Philippines', 'El Nido', 'beach', 'island-hopping', 180, 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80', 4.6),
+('Kyoto Heritage Walk', 'Japan', 'Kyoto', 'culture', 'museums', 210, 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=1200&q=80', 4.8),
+('Rome After Hours', 'Italy', 'Rome', 'culture', 'architecture', 190, 'https://images.unsplash.com/photo-1529260830199-42c24126f198?auto=format&fit=crop&w=1200&q=80', 4.7),
+('Alpine Grand Escape', 'Switzerland', 'Zermatt', 'luxury', 'resorts', 520, 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80', 4.9),
+('Desert Dune Reserve', 'UAE', 'Dubai', 'luxury', 'spa', 430, 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=1200&q=80', 4.5),
+('Taj Mahal Exploration', 'India', 'Agra', 'culture', 'architecture', 60, 'https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&w=1200&q=80', 4.9),
+('Goa Beach Bliss', 'India', 'Goa', 'beach', 'snorkeling', 70, 'https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=1200&q=80', 4.5),
+('Manali Snow Peaks', 'India', 'Manali', 'adventure', 'hiking', 50, 'https://images.unsplash.com/photo-1605649487212-4d4ce3e0116b?auto=format&fit=crop&w=1200&q=80', 4.7),
+('Kerala Backwaters Resort', 'India', 'Alleppey', 'luxury', 'spa', 200, 'https://images.unsplash.com/photo-1593693397690-362cb9666fc2?auto=format&fit=crop&w=1200&q=80', 4.8),
+('Andes Summit', 'Argentina', 'Mendoza', 'adventure', 'trekking', 110, 'https://images.unsplash.com/photo-1506509930965-c3f25c7a31eb?auto=format&fit=crop&w=1200&q=80', 4.6),
+('Tokyo Modern Walk', 'Japan', 'Tokyo', 'culture', 'museums', 250, 'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=1200&q=80', 4.8),
+('Maui Sunset View', 'USA', 'Hawaii', 'beach', 'island-hopping', 350, 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80', 4.7),
+('Paris Elite', 'France', 'Paris', 'luxury', 'resorts', 600, 'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?auto=format&fit=crop&w=1200&q=80', 4.9);
