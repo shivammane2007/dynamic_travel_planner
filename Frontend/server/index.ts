@@ -8,7 +8,7 @@ import { handlePlanner } from "./routes/planner";
 import { 
   handleGetStats, handleGetRevenue, handleGetActivities, 
   handleGetManualTrips, handleGetContactMessages, 
-  handleGetPackages, handleGetBookingsList 
+  handleGetPackages, handleGetPackageById, handleGetBookingsList 
 } from "./routes/mockDashboard";
 
 export function createServer() {
@@ -43,6 +43,7 @@ export function createServer() {
   app.get("/api/manual-trips", handleGetManualTrips);
   app.get("/api/contact-messages", handleGetContactMessages);
   app.get("/api/packages", handleGetPackages);
+  app.get("/api/packages/:id", handleGetPackageById);
   app.get("/api/bookings", handleGetBookingsList);
 
   return app;

@@ -93,7 +93,14 @@ export default function BookingPage() {
           travelers,
           totalPrice: total,
           status: "CONFIRMED",
-          travelDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] // 30 days from now
+          travelDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 30 days from now
+          firstName: form.firstName,
+          lastName: form.lastName,
+          email: form.email,
+          phone: form.phone,
+          specialRequests: form.specialRequests,
+          packageTitle: pkgData.title,
+          destination: pkgData.destination
         }),
       });
 

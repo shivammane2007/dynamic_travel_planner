@@ -1,6 +1,6 @@
 import Layout from "@/components/Layout";
 import PackageCard from "@/components/PackageCard";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Search, ChevronDown } from "lucide-react";
 
 export default function Packages() {

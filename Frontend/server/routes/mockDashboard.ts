@@ -54,6 +54,37 @@ export const handleGetPackages: RequestHandler = (_req, res) => {
   ]);
 };
 
+export const handleGetPackageById: RequestHandler = (req, res) => {
+  const id = parseInt(req.params.id);
+  const packages = [
+    { 
+      id: 1, title: "Parisian Romance", city: "Paris", country: "France", durationDays: 7, 
+      pricePerPerson: 2499, rating: 4.9, reviewsCount: 124, minPeople: 2, maxPeople: 12,
+      description: "Experience the magic of Paris with our exclusive romantic getaway. Enjoy private tours, luxury dining, and skip-the-line access to iconic landmarks.",
+      image: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=800&h=400&fit=crop"
+    },
+    { 
+      id: 2, title: "Bali Escape", city: "Bali", country: "Indonesia", durationDays: 5, 
+      pricePerPerson: 1799, rating: 4.8, reviewsCount: 89, minPeople: 1, maxPeople: 8,
+      description: "Relax on the beautiful beaches of Bali. This package offers a serene escape with luxury spa treatments, private villa accommodation, and cultural excursions.",
+      image: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800&h=400&fit=crop"
+    },
+    { 
+      id: 3, title: "Tokyo Adventure", city: "Tokyo", country: "Japan", durationDays: 8, 
+      pricePerPerson: 2199, rating: 4.7, reviewsCount: 210, minPeople: 1, maxPeople: 10,
+      description: "Explore the vibrant streets of Tokyo. Dive deep into the culture with guided tours of historic temples, a sushi-making masterclass, and vibrant city nightlife.",
+      image: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800&h=400&fit=crop"
+    }
+  ];
+  
+  const pkg = packages.find(p => p.id === id);
+  if (pkg) {
+    res.json({ success: true, data: pkg });
+  } else {
+    res.status(404).json({ success: false, message: "Package not found" });
+  }
+};
+
 export const handleGetBookingsList: RequestHandler = (_req, res) => {
   res.json([
     { id: 1, packageId: 1, travelers: 2, totalPrice: 4998, bookingDate: new Date(Date.now() - 432000000).toISOString(), status: "CONFIRMED" },
