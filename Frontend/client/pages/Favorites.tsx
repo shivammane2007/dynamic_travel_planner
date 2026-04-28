@@ -1,10 +1,17 @@
+import React from "react";
 import Layout from "@/components/Layout";
 import { useFavorites, FavoritePackage } from "@/hooks/useFavorites";
 import { Link } from "react-router-dom";
 import { MapPin, Calendar, Star, Trash2, Heart } from "lucide-react";
 import { toast } from "sonner";
 
-function FavoriteCard({ pkg, onRemove }: { pkg: FavoritePackage; onRemove: (id: string) => void }) {
+function FavoriteCard({
+  pkg,
+  onRemove,
+}: {
+  pkg: FavoritePackage;
+  onRemove: (id: string) => void;
+}) {
   const [imgError, setImgError] = React.useState(false);
 
   const handleRemove = (e: React.MouseEvent) => {
@@ -85,9 +92,6 @@ function FavoriteCard({ pkg, onRemove }: { pkg: FavoritePackage; onRemove: (id: 
     </div>
   );
 }
-
-// Need React in scope for useState
-import React from "react";
 
 export default function Favorites() {
   const { favorites, removeFavorite } = useFavorites();
