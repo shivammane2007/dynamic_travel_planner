@@ -12,9 +12,11 @@ import {
   Share2,
   ChevronRight,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import CustomizeTripModal from "@/components/CustomizeTripModal";
+import ShareModal from "@/components/ShareModal";
+import { useFavorites } from "@/hooks/useFavorites";
 
 export default function PackageDetail() {
   const { id } = useParams();
@@ -22,6 +24,62 @@ export default function PackageDetail() {
   const [quantity, setQuantity] = useState(1);
   const [isBookingLoading, setIsBookingLoading] = useState(false);
   const [isCustomizeOpen, setIsCustomizeOpen] = useState(false);
+  const [isShareOpen, setIsShareOpen] = useState(false);
+  const [heartPop, setHeartPop] = useState(false);
+  const { isFavorite, toggleFavorite } = useFavorites();
+
+  // Derived after package data is defined (see below)
+  const packageId = id || "1";
+
+  const handleLike = () => {
+    const pkg = {
+      id: packageId,
+      title: package_data.title,
+      destination: package_data.destination,
+      description: package_data.description,
+      image: package_data.image,
+      price: package_data.price,
+      duration: package_data.duration,
+      rating: package_data.rating,
+      reviews: package_data.reviewCount,
+    };
+    const added = toggleFavorite(pkg);
+    // Heart pop animation
+    setHeartPop(true);
+    setTimeout(() => setHeartPop(false), 400);
+    if (added) {
+      toast.success("❤️ Added to Favorites", {
+        description: `${package_data.title} saved to your wishlist`,
+        duration: 3000,
+      });
+    } else {
+      toast("💔 Removed from Favorites", {
+        description: `${package_data.title} removed from wishlist`,
+        duration: 2500,
+      });
+    }
+  };
+
+  const handleShare = async () => {
+    const shareUrl = window.location.href;
+    const shareData = {
+      title: package_data.title,
+      text: package_data.description,
+      url: shareUrl,
+    };
+    if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+      try {
+        await navigator.share(shareData);
+      } catch (err: any) {
+        // User cancelled or permission denied — show fallback modal
+        if (err.name !== "AbortError") {
+          setIsShareOpen(true);
+        }
+      }
+    } else {
+      setIsShareOpen(true);
+    }
+  };
 
   const handleBookNow = async () => {
     setIsBookingLoading(true);
@@ -168,10 +226,37 @@ export default function PackageDetail() {
                 </h1>
               </div>
               <div className="flex gap-3">
-                <button className="p-3 bg-white/20 hover:bg-white/30 rounded-lg transition-all text-white">
-                  <Heart className="w-6 h-6" />
+                {/* Like Button */}
+                <button
+                  id="pkg-like-btn"
+                  onClick={handleLike}
+                  className={`p-3 rounded-lg transition-all text-white ${
+                    isFavorite(packageId)
+                      ? "bg-red-500/80 hover:bg-red-600/90"
+                      : "bg-white/20 hover:bg-white/30"
+                  }`}
+                  title={isFavorite(packageId) ? "Remove from Favorites" : "Add to Favorites"}
+                  style={{
+                    transform: heartPop ? "scale(1.35)" : "scale(1)",
+                    transition: "transform 0.2s cubic-bezier(0.34,1.56,0.64,1), background-color 0.2s",
+                  }}
+                >
+                  <Heart
+                    className="w-6 h-6"
+                    style={{
+                      fill: isFavorite(packageId) ? "currentColor" : "none",
+                      stroke: "currentColor",
+                    }}
+                  />
                 </button>
-                <button className="p-3 bg-white/20 hover:bg-white/30 rounded-lg transition-all text-white">
+
+                {/* Share Button */}
+                <button
+                  id="pkg-share-btn"
+                  onClick={handleShare}
+                  className="p-3 bg-white/20 hover:bg-white/30 rounded-lg transition-all text-white"
+                  title="Share this package"
+                >
                   <Share2 className="w-6 h-6" />
                 </button>
               </div>
@@ -487,6 +572,14 @@ export default function PackageDetail() {
           duration: package_data.duration,
         }}
         travelers={quantity}
+      />
+
+      <ShareModal
+        isOpen={isShareOpen}
+        onClose={() => setIsShareOpen(false)}
+        title={package_data.title}
+        description={package_data.description}
+        url={window.location.href}
       />
     </Layout>
   );

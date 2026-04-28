@@ -14,6 +14,7 @@ import BlogDetail from "./pages/BlogDetail";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import AdminDashboard from "./pages/AdminDashboard";
+import Favorites from "./pages/Favorites";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -35,6 +36,8 @@ export default function App() {
             <Route path="/blog/:slug" element={<BlogDetail />} />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/favorites" element={<Favorites />} />
+            <Route path="/wishlist" element={<Favorites />} />
 
             {/* Admin Routes */}
             <Route path="/admin" element={<AdminDashboard />} />
