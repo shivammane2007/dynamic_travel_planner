@@ -1,0 +1,202 @@
+/** @import must precede all other statements */
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700;800&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /**
+   * Tailwind CSS theme - LUX Travel Brand Colors
+   * tailwind.config.ts expects the following color variables to be expressed as HSL values.
+   * A different format will require also updating the theme in tailwind.config.ts.
+  */
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 15 30% 18%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 15 30% 18%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 15 30% 18%;
+
+    /* Primary: Vibrant Teal (luxury travel feel) */
+    --primary: 189 100% 30%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Secondary: Coral/Orange (energy & adventure) */
+    --secondary: 27 100% 54%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    /* Accent: Gold/Amber (luxury highlight) */
+    --accent: 43 97% 54%;
+    --accent-foreground: 15 30% 18%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 210 20% 88%;
+    --input: 210 20% 94%;
+    --ring: 189 100% 30%;
+
+    --radius: 0.75rem;
+
+    --sidebar-background: 210 40% 96.1%;
+    --sidebar-foreground: 15 30% 18%;
+    --sidebar-primary: 189 100% 30%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 43 97% 54%;
+    --sidebar-accent-foreground: 15 30% 18%;
+    --sidebar-border: 210 20% 88%;
+    --sidebar-ring: 189 100% 30%;
+  }
+
+  .dark {
+    --background: 15 20% 12%;
+    --foreground: 0 0% 98%;
+
+    --card: 15 25% 18%;
+    --card-foreground: 0 0% 98%;
+
+    --popover: 15 25% 18%;
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 189 100% 40%;
+    --primary-foreground: 15 20% 12%;
+
+    --secondary: 27 100% 60%;
+    --secondary-foreground: 15 20% 12%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 43 97% 60%;
+    --accent-foreground: 15 20% 12%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 15 25% 28%;
+    --input: 15 25% 22%;
+    --ring: 189 100% 40%;
+    --sidebar-background: 15 20% 12%;
+    --sidebar-foreground: 0 0% 98%;
+    --sidebar-primary: 189 100% 40%;
+    --sidebar-primary-foreground: 15 20% 12%;
+    --sidebar-accent: 43 97% 60%;
+    --sidebar-accent-foreground: 15 20% 12%;
+    --sidebar-border: 15 25% 28%;
+    --sidebar-ring: 189 100% 40%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-poppins;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-playfair font-bold;
+  }
+
+  h1 {
+    @apply text-4xl md:text-5xl lg:text-6xl;
+  }
+
+  h2 {
+    @apply text-3xl md:text-4xl;
+  }
+
+  h3 {
+    @apply text-2xl md:text-3xl;
+  }
+
+  :where(p, span, li, h1, h2, h3, h4, h5, h6, a, button, label, td, th) {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  pre,
+  code {
+    overflow-x: auto;
+    white-space: pre;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply px-6 py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover:opacity-90 transition-opacity;
+  }
+
+  .btn-secondary {
+    @apply px-6 py-3 bg-secondary text-secondary-foreground rounded-lg font-semibold hover:opacity-90 transition-opacity;
+  }
+
+  .btn-outline {
+    @apply px-6 py-3 border-2 border-primary text-primary rounded-lg font-semibold hover:bg-primary hover:text-primary-foreground transition-all;
+  }
+
+  .section-padding {
+    @apply px-4 md:px-8 lg:px-12 py-12 md:py-16 lg:py-20;
+  }
+
+  .gradient-accent {
+    @apply bg-gradient-to-r from-primary to-secondary;
+  }
+}
+
+@layer utilities {
+  @keyframes shimmer {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes slide-up {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-shimmer {
+    animation: shimmer 2s infinite;
+  }
+
+  .animate-fade-in {
+    animation: fade-in 0.5s ease-out;
+  }
+
+  .animate-slide-up {
+    animation: slide-up 0.6s ease-out;
+  }
+}

@@ -1,0 +1,67 @@
+# ==============================================
+# Lux Travel Planner — .gitignore
+# ==============================================
+
+# Dependencies
+node_modules/
+Frontend/node_modules/
+
+# Build outputs
+dist/
+Frontend/dist/
+
+# Environment variables — NEVER commit secrets
+.env
+.env.*
+!.env.example
+Frontend/.env
+Frontend/.env.*
+Backend/.env
+Backend/.env.*
+
+# Java build artifacts
+target/
+java-backend/target/
+Backend/java-backend/target/
+dependency-reduced-pom.xml
+Backend/java-backend/dependency-reduced-pom.xml
+
+# Archive — not for version control
+Archive/
+
+# IDE / Editor
+.vscode/
+.idea/
+*.iml
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS files
+.DS_Store
+.DS_Store?
+Thumbs.db
+ehthumbs.db
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Cache
+.cache/
+.builder/
+*.cache
+Frontend/.vite/
+
+# TypeScript
+*.tsbuildinfo
+
+# Misc
+*.zip
+*.tar.gz
